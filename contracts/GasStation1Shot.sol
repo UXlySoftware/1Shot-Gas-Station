@@ -31,7 +31,8 @@ contract GasStation1Shot {
     /// Errors ///
 
     error CallToDiamondFailed(bytes);
-    error InvalidDiamondFunctionSignature();
+    error InvalidDiamondFunctionSignature(bytes4 selector);
+    error AuthorizingAddressNotReceiver(address from, address receiver);
 
     constructor(address _lifiDiamond) {
         LIFI_DIAMOND = _lifiDiamond;
@@ -57,18 +58,18 @@ contract GasStation1Shot {
             selector != MULTIPLE_V3_ERC20_TO_NATIVE_SELECTOR &&
             selector != SINGLE_V3_ERC20_TO_NATIVE_SELECTOR
         ) {
-            revert InvalidDiamondFunctionSignature();
+            revert InvalidDiamondFunctionSignature(selector);
         }
 
-        // Extract _receiver from diamondCalldata at offset 100 (0x64)
+        // Make sure the authorizing address will be the receiver of the tokens
         address receiver;
         assembly {
-            // _receiver is at offset diamondCalldata.offset + 4 + (32 * 3)
+            // _receiver is at offset diamondCalldata.offset + 4 + (32 * 3) + (32-20)
             receiver := shr(96, calldataload(add(diamondCalldata.offset, 100)))
         }
 
         if (receiver != from) {
-            revert("Receiver must match from address");
+            revert AuthorizingAddressNotReceiver(from, receiver);
         }
 
         // first use the authorization to transfer tokens from the users wallet to this contract
