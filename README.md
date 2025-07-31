@@ -16,4 +16,4 @@ FraxFinance EIP-3009 implementation: https://github.com/FraxFinance/fraxtal-usdc
 
 ## Deployments: 
 
-Base - [0x678586adA236937458D0e8cc9AbfCCfEA6918D8B](https://basescan.org/address/0x678586adA236937458D0e8cc9AbfCCfEA6918D8B)
+Base - [0xD9699942281A00188707d3244c9Cb827DE0e4A3c](https://basescan.org/address/0xD9699942281A00188707d3244c9Cb827DE0e4A3c)

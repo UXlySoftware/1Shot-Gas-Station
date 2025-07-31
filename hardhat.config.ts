@@ -67,10 +67,10 @@ task("x402-gas-station", "hit the gas station URL with an x402 payload")
 
     const tokenAddress = "0x833589fcd6edb6e08f4c7c32d4f71b54bda02913"; // USDC on Base
     const amount = taskArgs.amount;
-    const to = "0x678586adA236937458D0e8cc9AbfCCfEA6918D8B";
+    const to = "0xD9699942281A00188707d3244c9Cb827DE0e4A3c";
     const now = Math.floor(Date.now() / 1000);
     const validAfter = now;
-    const validBefore = now + 60;
+    const validBefore = now + 90;
     const nonce = "0x" + randomBytes(32).toString("hex");
 
     const data = {
@@ -101,13 +101,11 @@ task("x402-gas-station", "hit the gas station URL with an x402 payload")
       },
     };
 
-    console.log("Signing data:", JSON.stringify(data, null, 2));
     const signature = await signer.signTypedData(
       data.domain,
       data.types,
       data.message
     );
-    console.log("Signature:", signature);
 
     const xPaymentObject = {
       from: signer.address,
