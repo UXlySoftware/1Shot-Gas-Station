@@ -83,9 +83,6 @@ contract GasStation1Shot {
             revert AuthorizingAddressNotReceiver(from, receiver);
         }
 
-        uint256 balanceBefore = IERC20WithEIP3009(tokenAddress).balanceOf(
-            address(this)
-        );
         // first use the authorization to transfer tokens from the users wallet to this contract
         IERC20WithEIP3009(tokenAddress).transferWithAuthorization(
             from,
@@ -96,16 +93,6 @@ contract GasStation1Shot {
             nonce,
             signature
         );
-        uint256 balanceAfter = IERC20WithEIP3009(tokenAddress).balanceOf(
-            address(this)
-        );
-        if ((balanceAfter - balanceBefore) < value) {
-            revert IncorrectTokenBalance(
-                tokenAddress,
-                balanceBefore,
-                balanceAfter
-            );
-        }
 
         // approve the Li.Fi diamond contract to spend the tokens
         if (
@@ -120,24 +107,6 @@ contract GasStation1Shot {
             );
         }
 
-        uint256 currentAllowance = IERC20WithEIP3009(tokenAddress).allowance(
-            address(this),
-            LIFI_DIAMOND
-        );
-        if (currentAllowance < value) {
-            revert InsufficientAllowance(
-                tokenAddress,
-                LIFI_DIAMOND,
-                value,
-                currentAllowance
-            );
-        }
-
-        // Return empty bytes to indicate success
-        // return Address.functionCall(
-        //     LIFI_DIAMOND,
-        //     diamondCalldata
-        // );
         return _executeCalldata(diamondCalldata);
     }
 
