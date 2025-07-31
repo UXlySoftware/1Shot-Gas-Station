@@ -1,6 +1,7 @@
 import { HardhatUserConfig } from "hardhat/config";
 import "@nomicfoundation/hardhat-toolbox";
 const { randomBytes } = require("crypto");
+import axios from "axios";
 
 const INFURA_API_KEY = vars.has("INFURA_API_KEY")
   ? [vars.get("INFURA_API_KEY")]
@@ -60,20 +61,31 @@ task("accounts", "Prints the list of accounts", async (taskArgs, hre) => {
 });
 
 task("x402-gas-station", "hit the gas station URL with an x402 payload")
+  .addParam("tokenaddress", "The address of the token to send")
   .addParam("amount", "The amount of tokens to send")
   .setAction(async (taskArgs, hre) => {
     const accounts = await hre.ethers.getSigners();
     const signer = accounts[0];
 
-    const latestBlock = await signer.provider.getBlock("latest")
+    const latestBlock = await signer.provider.getBlock("latest");
 
-    const tokenAddress = "0x833589fcd6edb6e08f4c7c32d4f71b54bda02913"; // USDC on Base
+    const chainId = await signer.provider.getNetwork().then((n) => n.chainId);
+    const tokenAddress = taskArgs.tokenaddress;
     const amount = taskArgs.amount;
-    const to = "0x17Ed2c50596E1C74175F905918dEd2d2042b87f3";
+    const to = "0x17Ed2c50596E1C74175F905918dEd2d2042b87f3"; // the to address is always the gas station address
     const now = latestBlock.timestamp;
     const validAfter = now;
     const validBefore = now + 90;
     const nonce = "0x" + randomBytes(32).toString("hex");
+
+    const token = await hre.ethers.getContractAt(
+      [
+        "function name() view returns (string)",
+        "function version() view returns (string)",
+      ],
+      tokenAddress,
+      signer
+    );
 
     const data = {
       types: {
@@ -87,9 +99,9 @@ task("x402-gas-station", "hit the gas station URL with an x402 payload")
         ],
       },
       domain: {
-        name: "USD Coin",
-        version: "2",
-        chainId: 8453,
+        name: await token.name(),
+        version: await token.version(),
+        chainId: chainId,
         verifyingContract: tokenAddress,
       },
       primaryType: "TransferWithAuthorization",
@@ -110,23 +122,36 @@ task("x402-gas-station", "hit the gas station URL with an x402 payload")
     );
 
     const xPaymentObject = {
-      from: signer.address,
-      to: to,
-      value: amount,
-      validAfter: validAfter,
-      validBefore: validBefore,
-      nonce: nonce,
+      ...data.message,
       signature: signature,
     };
 
-    console.log("validAfter:", validAfter);
-    console.log("validBefore:", validBefore);
-    console.log("nonce:", nonce);
-    console.log("signature:", signature);
-
     const jsonString = JSON.stringify(xPaymentObject);
     const base64Encoded = Buffer.from(jsonString, "utf-8").toString("base64");
-    console.log("Base64 Encoded Payload:", base64Encoded);
+
+    const body = {
+      fromChain: chainId.toString(),
+      fromToken: tokenAddress,
+      fromAmount: amount.toString(),
+      fromAddress: signer.address,
+      toChain: chainId.toString(),
+      toToken: "0x0000000000000000000000000000000000000000", // we only ask for native
+    };
+
+    const url =
+      "https://n8n.1shotapi.dev/webhook-test/92c5ca23-99a7-437d-85da-84aef8bd2a25";
+
+    const response = await axios.post(url, body, {
+      headers: {
+        "x-payment": base64Encoded,
+        "User-Agent": "CustomUserAgent/1.0",
+        Accept: "application/json",
+        "Content-Type": "application/json",
+      },
+    });
+
+    console.log("Response status:", response.status);
+    console.log("Response body:", response.data);
   });
 
 export default config;
