@@ -65,10 +65,12 @@ task("x402-gas-station", "hit the gas station URL with an x402 payload")
     const accounts = await hre.ethers.getSigners();
     const signer = accounts[0];
 
+    const latestBlock = await signer.provider.getBlock("latest")
+
     const tokenAddress = "0x833589fcd6edb6e08f4c7c32d4f71b54bda02913"; // USDC on Base
     const amount = taskArgs.amount;
-    const to = "0xD9699942281A00188707d3244c9Cb827DE0e4A3c";
-    const now = Math.floor(Date.now() / 1000);
+    const to = "0x17Ed2c50596E1C74175F905918dEd2d2042b87f3";
+    const now = latestBlock.timestamp;
     const validAfter = now;
     const validBefore = now + 90;
     const nonce = "0x" + randomBytes(32).toString("hex");
@@ -116,6 +118,11 @@ task("x402-gas-station", "hit the gas station URL with an x402 payload")
       nonce: nonce,
       signature: signature,
     };
+
+    console.log("validAfter:", validAfter);
+    console.log("validBefore:", validBefore);
+    console.log("nonce:", nonce);
+    console.log("signature:", signature);
 
     const jsonString = JSON.stringify(xPaymentObject);
     const base64Encoded = Buffer.from(jsonString, "utf-8").toString("base64");

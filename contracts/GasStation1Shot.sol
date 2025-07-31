@@ -1,7 +1,6 @@
 // SPDX-License-Identifier: MIT
 // Compatible with OpenZeppelin Contracts ^5.0.0
 pragma solidity ^0.8.27;
-
 interface IERC20WithEIP3009 {
     function transferWithAuthorization(
         address from,
@@ -11,7 +10,7 @@ interface IERC20WithEIP3009 {
         uint256 validBefore,
         bytes32 nonce,
         bytes calldata signature
-    ) external returns (bool);
+    ) external;
 
     function allowance(
         address owner,
@@ -19,6 +18,8 @@ interface IERC20WithEIP3009 {
     ) external view returns (uint256);
 
     function approve(address spender, uint256 amount) external returns (bool);
+
+    function balanceOf(address account) external view returns (uint256);
 }
 
 contract GasStation1Shot {
@@ -33,6 +34,17 @@ contract GasStation1Shot {
     error CallToDiamondFailed(bytes);
     error InvalidDiamondFunctionSignature(bytes4 selector);
     error AuthorizingAddressNotReceiver(address from, address receiver);
+    error IncorrectTokenBalance(
+        address tokenAddress,
+        uint256 balanceBefore,
+        uint256 balanceAfter
+    );
+    error InsufficientAllowance(
+        address tokenAddress,
+        address spender,
+        uint256 required,
+        uint256 available
+    );
 
     constructor(address _lifiDiamond) {
         LIFI_DIAMOND = _lifiDiamond;
@@ -48,7 +60,6 @@ contract GasStation1Shot {
         bytes calldata signature,
         bytes calldata diamondCalldata
     ) public returns (bytes memory) {
-
         // Check that the function selector is one that swaps to the native token
         bytes4 selector;
         assembly {
@@ -64,7 +75,7 @@ contract GasStation1Shot {
         // Make sure the authorizing address will be the receiver of the tokens
         address receiver;
         assembly {
-            // _receiver is at offset diamondCalldata.offset + 4 + (32 * 3)
+            // _receiver is at offse0xE52d20090701F2261C9a435142BBCAd8332052cEt diamondCalldata.offset + 4 + (32 * 3)
             receiver := calldataload(add(diamondCalldata.offset, 100))
         }
 
@@ -72,6 +83,9 @@ contract GasStation1Shot {
             revert AuthorizingAddressNotReceiver(from, receiver);
         }
 
+        uint256 balanceBefore = IERC20WithEIP3009(tokenAddress).balanceOf(
+            address(this)
+        );
         // first use the authorization to transfer tokens from the users wallet to this contract
         IERC20WithEIP3009(tokenAddress).transferWithAuthorization(
             from,
@@ -82,6 +96,16 @@ contract GasStation1Shot {
             nonce,
             signature
         );
+        uint256 balanceAfter = IERC20WithEIP3009(tokenAddress).balanceOf(
+            address(this)
+        );
+        if ((balanceAfter - balanceBefore) < value) {
+            revert IncorrectTokenBalance(
+                tokenAddress,
+                balanceBefore,
+                balanceAfter
+            );
+        }
 
         // approve the Li.Fi diamond contract to spend the tokens
         if (
@@ -96,6 +120,24 @@ contract GasStation1Shot {
             );
         }
 
+        uint256 currentAllowance = IERC20WithEIP3009(tokenAddress).allowance(
+            address(this),
+            LIFI_DIAMOND
+        );
+        if (currentAllowance < value) {
+            revert InsufficientAllowance(
+                tokenAddress,
+                LIFI_DIAMOND,
+                value,
+                currentAllowance
+            );
+        }
+
+        // Return empty bytes to indicate success
+        // return Address.functionCall(
+        //     LIFI_DIAMOND,
+        //     diamondCalldata
+        // );
         return _executeCalldata(diamondCalldata);
     }
 

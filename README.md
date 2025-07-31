@@ -5,15 +5,15 @@ This project demonstrates a basic Hardhat use case. It comes with a sample contr
 Try running some of the following tasks:
 
 ```shell
-npx hardhat help
-npx hardhat test
-REPORT_GAS=true npx hardhat test
-npx hardhat node
-npx hardhat ignition deploy ./ignition/modules/Lock.ts
+npx hardhat vars set INFURA_API_KEY
+npx hardhat vars set PRIVATE_KEY
+npx hardhat vars set ETHERSCAN_API_KEY
+npx hardhat ignition deploy ./ignition/modules/TestnetDeploy.ts --network <testnetwork>
+npx hardhat ignition verify chain-<chainId> --include-unrelated-contracts
 ```
 
 FraxFinance EIP-3009 implementation: https://github.com/FraxFinance/fraxtal-usdc
 
 ## Deployments: 
 
-Base - [0xD9699942281A00188707d3244c9Cb827DE0e4A3c](https://basescan.org/address/0xD9699942281A00188707d3244c9Cb827DE0e4A3c)
+Base - [0x17ed2c50596e1c74175f905918ded2d2042b87f3](https://basescan.org/address/0x17ed2c50596e1c74175f905918ded2d2042b87f3)
