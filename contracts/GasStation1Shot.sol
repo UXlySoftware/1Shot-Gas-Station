@@ -75,7 +75,7 @@ contract GasStation1Shot {
         // Make sure the authorizing address will be the receiver of the tokens
         address receiver;
         assembly {
-            // _receiver is at offse0xE52d20090701F2261C9a435142BBCAd8332052cEt diamondCalldata.offset + 4 + (32 * 3)
+            // _receiver is at diamondCalldata.offset + 4 + (32 * 3)
             receiver := calldataload(add(diamondCalldata.offset, 100))
         }
 
