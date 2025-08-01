@@ -34,17 +34,6 @@ contract GasStation1Shot {
     error CallToDiamondFailed(bytes);
     error InvalidDiamondFunctionSignature(bytes4 selector);
     error AuthorizingAddressNotReceiver(address from, address receiver);
-    error IncorrectTokenBalance(
-        address tokenAddress,
-        uint256 balanceBefore,
-        uint256 balanceAfter
-    );
-    error InsufficientAllowance(
-        address tokenAddress,
-        address spender,
-        uint256 required,
-        uint256 available
-    );
 
     constructor(address _lifiDiamond) {
         LIFI_DIAMOND = _lifiDiamond;
