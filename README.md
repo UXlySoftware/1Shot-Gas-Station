@@ -8,10 +8,11 @@ The Gas Station contract uses [Li.Fi](https://li.fi/) to perform swaps, and is d
 
 The [GasStation1Shot.sol](/contracts/GasStation1Shot.sol) contract can only be used with ERC-20 tokens that are [EIP-3009](https://eips.ethereum.org/EIPS/eip-3009) compatible, (like [USDC](https://github.com/FraxFinance/fraxtal-usdc) and USDT) and it is intended only to swap a users tokens into native coins. 
 
-There are two checks performed internally:
+There are three checks performed internally:
 
 1. The function signature on the `diamondCalldata` is ensured to correspond to one of the Li.Fi functions which swap to native coins (the swap is guaranteed to produce native coins).
 2. The recipient of the native tokens is ensured to be the same address as the address which signed the EIP-3009 authorization (the authorizor is guaranteed to be the recipient of the output of the swap).
+3. All funds authorized to be swapped by the user are ensured to be swapped (i.e. the relayer cannot input `diamondCalldata` that will leave residual tokens in the Gas Station after the transaction). 
 
 The slippage and fee data is set by the person/relayer who submits the transaction and is not guaranteed for the end user since this would require a second signature for the user to sign. The intention is that this Gas Station swap contract would only be used to procure small amounts of native token, so there is low risk to the user to lose substantial funds. 
 
