@@ -34,6 +34,12 @@ contract GasStation1Shot {
     error CallToDiamondFailed(bytes);
     error InvalidDiamondFunctionSignature(bytes4 selector);
     error AuthorizingAddressNotReceiver(address from, address receiver);
+    error UnspentUserFunds(
+        address tokenAddress,
+        uint256 amount,
+        address receiver,
+        address caller
+    );
 
     constructor(address _lifiDiamond) {
         LIFI_DIAMOND = _lifiDiamond;
@@ -96,7 +102,22 @@ contract GasStation1Shot {
             );
         }
 
-        return _executeCalldata(diamondCalldata);
+        bytes memory data = _executeCalldata(diamondCalldata);
+
+        // ensure that no user funds were left unspent
+        uint leftoverBalance = IERC20WithEIP3009(tokenAddress).balanceOf(
+            address(this)
+        );
+        if (leftoverBalance > 0) {
+            revert UnspentUserFunds(
+                tokenAddress,
+                leftoverBalance,
+                receiver,
+                tx.origin // blame the relayer
+            );
+        }
+
+        return data;
     }
 
     function _executeCalldata(
