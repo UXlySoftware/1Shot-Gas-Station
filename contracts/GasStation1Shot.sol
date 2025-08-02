@@ -45,7 +45,7 @@ contract GasStation1Shot {
         LIFI_DIAMOND = _lifiDiamond;
     }
 
-    function callDiamondWithEIP3009SignatureForGas(
+    function callDiamondWithEIP3009SignatureToNative(
         address tokenAddress,
         address from,
         uint256 value,
