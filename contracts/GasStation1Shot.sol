@@ -45,6 +45,20 @@ contract GasStation1Shot {
         LIFI_DIAMOND = _lifiDiamond;
     }
 
+    /// @notice Allows to bridge tokens of one type through a LI.FI diamond
+    ///         contract using EIP-3009 signatures through self-sponsoshipt or a relayer.
+    ///         The contract ensures the authorizer is the receiver of the native tokens
+    ///         and that the function signature is one of the LI.FI functions that swaps to
+    ///         native tokens. Lastly, it ensures that all user funds are spent. A malicious
+    ///         relayer can still charge an excessive fee or an unoptimized swap route.
+    /// @param tokenAddress the address of the token to swap
+    /// @param from the address of the user who signed the EIP-3009 authorization
+    /// @param value the amount of tokens to swap
+    /// @param validAfter the timestamp after which the authorization is valid
+    /// @param validBefore the timestamp before which the authorization is valid
+    /// @param nonce the nonce of the EIP-3009 authorization
+    /// @param signature the signature giving approval to transfer tokens
+    /// @param diamondCalldata the calldata to execute
     function callDiamondWithEIP3009SignatureToNative(
         address tokenAddress,
         address from,
