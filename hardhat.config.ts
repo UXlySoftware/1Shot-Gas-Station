@@ -38,11 +38,16 @@ const config: HardhatUserConfig = {
       url: `https://base-mainnet.infura.io/v3/${INFURA_API_KEY}`,
       accounts: [`${PRIVATE_KEY}`],
     },
+    basesepolia: {
+      url: `https://base-sepolia.infura.io/v3/${INFURA_API_KEY}`,
+      accounts: [`${PRIVATE_KEY}`],
+    }
   },
   etherscan: {
     apiKey: {
       sepolia: `${ETHERSCAN_API_KEY}`,
       base: `${BASESCAN_API_KEY}`,
+      basesepolia: `${BASESCAN_API_KEY}`
     },
   },
 };
@@ -72,7 +77,7 @@ task("x402-gas-station", "hit the gas station URL with an x402 payload")
     const chainId = await signer.provider.getNetwork().then((n) => n.chainId);
     const tokenAddress = taskArgs.tokenaddress;
     const amount = taskArgs.amount;
-    const to = "0x17Ed2c50596E1C74175F905918dEd2d2042b87f3"; // the to address is always the gas station address
+    const to = "0x743ec62218964aE51C87e0A8b98bBFb8892badE8"; // the to address is always the gas station address
     const now = latestBlock.timestamp;
     const validAfter = now;
     const validBefore = now + 90;
@@ -132,10 +137,101 @@ task("x402-gas-station", "hit the gas station URL with an x402 payload")
     const body = {
       fromChain: chainId.toString(),
       fromToken: tokenAddress,
-      fromAmount: amount.toString(),
+      fromAmount: 110000, //amount.toString(),
       fromAddress: signer.address,
       toChain: chainId.toString(),
       toToken: "0x0000000000000000000000000000000000000000", // we only ask for native
+    };
+
+    const url =
+      "https://n8n.1shotapi.dev/webhook-test/92c5ca23-99a7-437d-85da-84aef8bd2a25";
+
+    const response = await axios.post(url, body, {
+      headers: {
+        "x-payment": base64Encoded,
+        "User-Agent": "CustomUserAgent/1.0",
+        Accept: "application/json",
+        "Content-Type": "application/json",
+      },
+    });
+
+    console.log("Response status:", response.status);
+    console.log("Response body:", response.data);
+  });
+
+task("x402-inference", "get inference over x402")
+  .addParam("tokenaddress", "The address of the token to send")
+  .addParam("amount", "The amount of tokens to send")
+  .addParam("userquery", "The user query to send")
+  .setAction(async (taskArgs, hre) => {
+    const accounts = await hre.ethers.getSigners();
+    const signer = accounts[0];
+
+    const latestBlock = await signer.provider.getBlock("latest");
+
+    const chainId = await signer.provider.getNetwork().then((n) => n.chainId);
+    const tokenAddress = taskArgs.tokenaddress;
+    const amount = taskArgs.amount;
+    const to = signer.address; // the to address is always the gas station address
+    const now = latestBlock.timestamp;
+    const validAfter = now;
+    const validBefore = now + 90;
+    const nonce = "0x" + randomBytes(32).toString("hex");
+    const userQuery = taskArgs.userquery;
+
+    const token = await hre.ethers.getContractAt(
+      [
+        "function name() view returns (string)",
+        "function version() view returns (string)",
+      ],
+      tokenAddress,
+      signer
+    );
+
+    const data = {
+      types: {
+        TransferWithAuthorization: [
+          { name: "from", type: "address" },
+          { name: "to", type: "address" },
+          { name: "value", type: "uint256" },
+          { name: "validAfter", type: "uint256" },
+          { name: "validBefore", type: "uint256" },
+          { name: "nonce", type: "bytes32" },
+        ],
+      },
+      domain: {
+        name: await token.name(),
+        version: await token.version(),
+        chainId: chainId,
+        verifyingContract: tokenAddress,
+      },
+      primaryType: "TransferWithAuthorization",
+      message: {
+        from: signer.address,
+        to: to,
+        value: amount,
+        validAfter: validAfter,
+        validBefore: validBefore,
+        nonce: nonce,
+      },
+    };
+
+    const signature = await signer.signTypedData(
+      data.domain,
+      data.types,
+      data.message
+    );
+
+    const xPaymentObject = {
+      ...data.message,
+      signature: signature,
+    };
+
+    const jsonString = JSON.stringify(xPaymentObject);
+    const base64Encoded = Buffer.from(jsonString, "utf-8").toString("base64");
+
+    const body = {
+      query: userQuery
     };
 
     const url =
