@@ -29,6 +29,21 @@ contract GasStation1Shot {
 
     bytes4 private immutable SINGLE_V3_ERC20_TO_NATIVE_SELECTOR = 0x733214a3;
 
+    bytes4 private immutable SWAP_START_BRIDGE_TOKENS_VIA_GAS_ZIP = 0x606326ff;
+
+    struct BridgeData {
+        bytes32 transactionId;
+        string bridge;
+        string integrator;
+        address referrer;
+        address sendingAssetId;
+        address receiver;
+        uint256 minAmount;
+        uint256 destinationChainId;
+        bool hasSourceSwaps;
+        bool hasDestinationCall;
+    }
+
     /// Errors ///
 
     error CallToDiamondFailed(bytes);
@@ -71,23 +86,26 @@ contract GasStation1Shot {
     ) public returns (bytes memory) {
         // Check that the function selector is one that swaps to the native token
         bytes4 selector;
+        address receiver;
         assembly {
             selector := calldataload(diamondCalldata.offset)
         }
         if (
-            selector != MULTIPLE_V3_ERC20_TO_NATIVE_SELECTOR &&
-            selector != SINGLE_V3_ERC20_TO_NATIVE_SELECTOR
+            selector == MULTIPLE_V3_ERC20_TO_NATIVE_SELECTOR ||
+            selector == SINGLE_V3_ERC20_TO_NATIVE_SELECTOR
         ) {
+            assembly {
+                // _receiver is at diamondCalldata.offset + 4 + (32 * 3)
+                receiver := calldataload(add(diamondCalldata.offset, 100))
+            }
+        } else if (selector == SWAP_START_BRIDGE_TOKENS_VIA_GAS_ZIP) {
+            // decode just the _bridgeData struct
+            receiver = abi.decode(diamondCalldata[4:], (BridgeData)).receiver;
+        } else {
             revert InvalidDiamondFunctionSignature(selector);
         }
 
         // Make sure the authorizing address will be the receiver of the tokens
-        address receiver;
-        assembly {
-            // _receiver is at diamondCalldata.offset + 4 + (32 * 3)
-            receiver := calldataload(add(diamondCalldata.offset, 100))
-        }
-
         if (receiver != from) {
             revert AuthorizingAddressNotReceiver(from, receiver);
         }

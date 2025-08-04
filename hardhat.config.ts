@@ -77,7 +77,7 @@ task("x402-gas-station", "hit the gas station URL with an x402 payload")
     const chainId = await signer.provider.getNetwork().then((n) => n.chainId);
     const tokenAddress = taskArgs.tokenaddress;
     const amount = taskArgs.amount;
-    const to = "0x743ec62218964aE51C87e0A8b98bBFb8892badE8"; // the to address is always the gas station address
+    const to = "0xA1BfEd6c6F1C3A516590edDAc7A8e359C2189A61"; // the to address is always the gas station address
     const now = latestBlock.timestamp;
     const validAfter = now;
     const validBefore = now + 90;
@@ -137,9 +137,9 @@ task("x402-gas-station", "hit the gas station URL with an x402 payload")
     const body = {
       fromChain: chainId.toString(),
       fromToken: tokenAddress,
-      fromAmount: 110000, //amount.toString(),
+      fromAmount: amount.toString(),
       fromAddress: signer.address,
-      toChain: chainId.toString(),
+      toChain: "56",
       toToken: "0x0000000000000000000000000000000000000000", // we only ask for native
     };
 
