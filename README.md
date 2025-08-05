@@ -30,4 +30,4 @@ npx hardhat x402-gas-station --tokenaddress 0x833589fcd6edb6e08f4c7c32d4f71b54bd
 
 ## Deployments: 
 
-Base - [0x743ec62218964aE51C87e0A8b98bBFb8892badE8](https://basescan.org/address/0x743ec62218964aE51C87e0A8b98bBFb8892badE8)
+Base - [0xA1BfEd6c6F1C3A516590edDAc7A8e359C2189A61](https://basescan.org/address/0xA1BfEd6c6F1C3A516590edDAc7A8e359C2189A61)

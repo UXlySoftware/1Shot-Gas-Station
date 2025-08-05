@@ -127,7 +127,7 @@
       "id": 1868,
 
       "key": "swl",
-      "chainType": "EVM",
+      "chainType"abs: "EVM",
       "id": 1923,
 
       "key": "opb",
