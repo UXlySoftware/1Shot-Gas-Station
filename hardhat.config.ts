@@ -229,8 +229,15 @@ task("x402-inference", "get inference over x402")
     );
 
     const xPaymentObject = {
-      ...data.message,
-      signature: signature,
+      x402Version: "1",
+      scheme: "exact",
+      network: chainId.toString(),
+      payload: {
+        signature: signature,
+        authorization: {
+          ...data.message
+        }
+      }
     };
 
     const jsonString = JSON.stringify(xPaymentObject);
