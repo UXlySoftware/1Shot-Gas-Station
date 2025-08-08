@@ -127,8 +127,15 @@ task("x402-gas-station", "hit the gas station URL with an x402 payload")
     );
 
     const xPaymentObject = {
-      ...data.message,
-      signature: signature,
+      x402Version: "1",
+      scheme: "exact",
+      network: chainId.toString(),
+      payload: {
+        signature: signature,
+        authorization: {
+          ...data.message
+        }
+      }
     };
 
     const jsonString = JSON.stringify(xPaymentObject);
@@ -139,12 +146,11 @@ task("x402-gas-station", "hit the gas station URL with an x402 payload")
       fromToken: tokenAddress,
       fromAmount: amount.toString(),
       fromAddress: signer.address,
-      toChain: "56",
-      toToken: "0x0000000000000000000000000000000000000000", // we only ask for native
+      toChain: "8453",
     };
 
     const url =
-      "https://n8n.1shotapi.dev/webhook-test/92c5ca23-99a7-437d-85da-84aef8bd2a25";
+      "https://n8n.1shotapi.dev/webhook-test/gas-station";
 
     const response = await axios.post(url, body, {
       headers: {
