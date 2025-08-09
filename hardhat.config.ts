@@ -27,7 +27,7 @@ const config: HardhatUserConfig = {
       create2: {
         // To learn more about salts, see the CreateX documentation
         // keccak256("1Shot-Gas-Station") is used as a salt for the GasStation1Shot contract
-        salt: "0de15a61349cf1fbf03ec15cb3cac430e667c92098dcd4ca02bbf55f4e033f78",
+        salt: "0x0de15a61349cf1fbf03ec15cb3cac430e667c92098dcd4ca02bbf55f4e033f78",
       },
     },
   },
@@ -43,7 +43,7 @@ const config: HardhatUserConfig = {
       accounts: [`${PRIVATE_KEY}`],
     },
     avalanche: {
-      url: `https://avalanche-fuji.infura.io/v3/${INFURA_API_KEY}`,
+      url: `https://avalanche-mainnet.infura.io/v3/${INFURA_API_KEY}`,
       accounts: [`${PRIVATE_KEY}`],
     },
     fuji: {
@@ -68,12 +68,12 @@ const config: HardhatUserConfig = {
       sepolia: `${ETHERSCAN_API_KEY}`,
       base: `${BASESCAN_API_KEY}`,
       basesepolia: `${BASESCAN_API_KEY}`,
-      arbitrum: `${ARBSCAN_API_KEY}`,
-      snowscan: `${ETHERSCAN_API_KEY}`
+      arbitrumOne: `${ARBSCAN_API_KEY}`,
+      avalanche: `${ETHERSCAN_API_KEY}`
     },
     customChains: [
       {
-        network: "snowscan",
+        network: "avalanche",
         chainId: 43113,
         urls: {
           apiURL: "https://api.etherscan.io/api?chainid=43113",
