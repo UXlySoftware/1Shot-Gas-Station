@@ -23,7 +23,7 @@ Try running some of the following tasks:
 npx hardhat vars set INFURA_API_KEY
 npx hardhat vars set PRIVATE_KEY
 npx hardhat vars set ETHERSCAN_API_KEY
-npx hardhat ignition deploy ./ignition/modules/GasStation1Shot.ts --network <testnetwork>
+npx hardhat ignition deploy ./ignition/modules/GasStation1Shot.ts --network base --strategy create2
 npx hardhat ignition verify chain-<chainId> --include-unrelated-contracts
 npx hardhat x402-gas-station --tokenaddress 0x833589fcd6edb6e08f4c7c32d4f71b54bda02913 --amount 100000 --network base
 ```

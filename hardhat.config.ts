@@ -3,22 +3,34 @@ import "@nomicfoundation/hardhat-toolbox";
 const { randomBytes } = require("crypto");
 import axios from "axios";
 
-const INFURA_API_KEY = vars.has("INFURA_API_KEY")
-  ? [vars.get("INFURA_API_KEY")]
-  : [];
 const PRIVATE_KEY = vars.has("PRIVATE_KEY")
   ? [vars.get("PRIVATE_KEY")]
   : ["0xac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80"];
+const INFURA_API_KEY = vars.has("INFURA_API_KEY")
+  ? [vars.get("INFURA_API_KEY")]
+  : [];
 const ETHERSCAN_API_KEY = vars.has("ETHERSCAN_API_KEY")
   ? [vars.get("ETHERSCAN_API_KEY")]
   : [];
 const BASESCAN_API_KEY = vars.has("BASESCAN_API_KEY")
   ? [vars.get("BASESCAN_API_KEY")]
   : [];
+const ARBSCAN_API_KEY = vars.has("ARBSCAN_API_KEY")
+  ? [vars.get("ARBSCAN_API_KEY")]
+  : [];
 
 const config: HardhatUserConfig = {
   solidity: "0.8.28",
   defaultNetwork: "hardhat",
+  ignition: {
+    strategyConfig: {
+      create2: {
+        // To learn more about salts, see the CreateX documentation
+        // keccak256("1Shot-Gas-Station") is used as a salt for the GasStation1Shot contract
+        salt: "0de15a61349cf1fbf03ec15cb3cac430e667c92098dcd4ca02bbf55f4e033f78",
+      },
+    },
+  },
   networks: {
     hardhat: {
       mining: {
@@ -28,6 +40,10 @@ const config: HardhatUserConfig = {
     },
     sepolia: {
       url: `https://sepolia.infura.io/v3/${INFURA_API_KEY}`,
+      accounts: [`${PRIVATE_KEY}`],
+    },
+    avalanche: {
+      url: `https://avalanche-fuji.infura.io/v3/${INFURA_API_KEY}`,
       accounts: [`${PRIVATE_KEY}`],
     },
     fuji: {
@@ -41,14 +57,30 @@ const config: HardhatUserConfig = {
     basesepolia: {
       url: `https://base-sepolia.infura.io/v3/${INFURA_API_KEY}`,
       accounts: [`${PRIVATE_KEY}`],
+    },
+    arbitrum: {
+      url: `https://arbitrum-mainnet.infura.io/v3/${INFURA_API_KEY}`,
+      accounts: [`${PRIVATE_KEY}`],
     }
   },
   etherscan: {
     apiKey: {
       sepolia: `${ETHERSCAN_API_KEY}`,
       base: `${BASESCAN_API_KEY}`,
-      basesepolia: `${BASESCAN_API_KEY}`
+      basesepolia: `${BASESCAN_API_KEY}`,
+      arbitrum: `${ARBSCAN_API_KEY}`,
+      snowscan: `${ETHERSCAN_API_KEY}`
     },
+    customChains: [
+      {
+        network: "snowscan",
+        chainId: 43113,
+        urls: {
+          apiURL: "https://api.etherscan.io/api?chainid=43113",
+          browserURL: "https://avalanche.testnet.localhost:8080"
+        }
+      }
+    ]
   },
 };
 
@@ -150,7 +182,7 @@ task("x402-gas-station", "hit the gas station URL with an x402 payload")
     };
 
     const url =
-      "https://n8n.1shotapi.dev/webhook-test/gas-station";
+      "https://n8n.1shotapi.dev/webhook/gas-station";
 
     const response = await axios.post(url, body, {
       headers: {

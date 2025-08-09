@@ -23,6 +23,11 @@ interface IERC20WithEIP3009 {
 }
 
 contract GasStation1Shot {
+
+    string public constant name = "1Shot Gas Station";
+
+    string public constant version = "1";
+
     address public immutable LIFI_DIAMOND;
 
     bytes4 private immutable MULTIPLE_V3_ERC20_TO_NATIVE_SELECTOR = 0x2c57e884;
