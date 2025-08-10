@@ -4,6 +4,10 @@ The 1Shot API Gas Station contract is meant to be used with an [x402](https://x4
 
 The Gas Station contract uses [Li.Fi](https://li.fi/) to perform swaps, and is designed to roughly mimic how the [Permit2Proxy](https://github.com/lifinance/contracts/blob/main/src/Periphery/Permit2Proxy.sol) contract works in the Li.Fi periphery. 
 
+## n8n
+
+A complete n8n relayer workflow is provided [here](./n8n.json). 
+
 ## Gas Station Details
 
 The [GasStation1Shot.sol](/contracts/GasStation1Shot.sol) contract can only be used with ERC-20 tokens that are [EIP-3009](https://eips.ethereum.org/EIPS/eip-3009) compatible, (like [USDC](https://github.com/FraxFinance/fraxtal-usdc) and USDT) and it is intended only to swap a users tokens into native coins. 
