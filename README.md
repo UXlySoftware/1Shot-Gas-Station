@@ -22,6 +22,28 @@ There are three checks performed internally:
 
 The slippage and fee data is set by the person/relayer who submits the transaction and is not guaranteed for the end user since this would require a second signature for the user to sign. The intention is that this Gas Station swap contract would only be used to procure small amounts of native token, so there is low risk to the user to lose substantial funds. 
 
+## Try It Out
+
+You can try [1Shot API's Gas Station Webapp](https://1shotapi.com/gas-station) or hit the API directly with curl and a valid x402 header:
+
+```sh
+# Be sure to put a valid x-payment header (https://1shotapi.com/tools)
+# and also set appropriate values for the from/to chains, fromAddress and amount
+curl -X POST \
+  https://n8n.1shotapi.dev/webhook-test/gas-station \
+  -H "x-payment: YOUR-BASE64-ENCODED-PAYMENT-PAYLOAD" \
+  -H "User-Agent: CustomUserAgent/1.0" \
+  -H "Accept: application/json" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "fromChain": "43114",
+    "fromToken": "0x9702230A8Ea53601f5cD2dc00fDBc13d4dF4A8c7",
+    "fromAmount": "1000000",
+    "fromAddress": "0x55680c6b69d598c0b42f93cd53dff3d20e069b5b",
+    "toChain": "43114"
+  }'
+```
+
 ## Hardhat Cheatsheet 
 Try running some of the following tasks:
 
