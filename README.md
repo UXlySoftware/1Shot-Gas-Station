@@ -35,7 +35,7 @@ You can try [1Shot API's Gas Station Webapp](https://1shotapi.com/gas-station) o
 # Be sure to put a valid x-payment header (https://1shotapi.com/tools)
 # and also set appropriate values for the from/to chains, fromAddress and amount
 curl -X POST \
-  https://n8n.1shotapi.dev/webhook-test/gas-station \
+  https://n8n.1shotapi.dev/webhook/gas-station \
   -H "x-payment: YOUR-BASE64-ENCODED-PAYMENT-PAYLOAD" \
   -H "User-Agent: CustomUserAgent/1.0" \
   -H "Accept: application/json" \
