@@ -8,7 +8,7 @@ The Gas Station contract uses [Li.Fi](https://li.fi/) to perform swaps, and is d
 
 ## n8n
 
-A complete n8n relayer workflow is provided [here](./n8n.json). 
+A complete n8n relayer workflow is provided [here](./n8n.json) for serving the Gas Station as an API. 
 
 ## Gas Station Details
 
