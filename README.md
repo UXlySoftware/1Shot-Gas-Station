@@ -26,7 +26,7 @@ The slippage and fee data is set by the person/relayer who submits the transacti
 
 ## Try It Out
 
-You can try [1Shot API's Gas Station Webapp](https://1shotapi.com/gas-station) or hit the API directly with curl and a [valid x402 header](https://1shotapi.com/tools)):
+You can try [1Shot API's Gas Station Webapp](https://1shotapi.com/gas-station) or hit the API directly with curl and a [valid x402 header](https://1shotapi.com/tools):
 
 > [!Note]
 > Leave the x-payment header out to get back a swap quote in the 402 response.
