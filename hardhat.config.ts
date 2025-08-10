@@ -76,7 +76,7 @@ const config: HardhatUserConfig = {
         network: "avalanche",
         chainId: 43113,
         urls: {
-          apiURL: "https://api.etherscan.io/api?chainid=43113",
+          apiURL: "https://api.etherscan.io/v2/api?chainid=43113",
           browserURL: "https://avalanche.testnet.localhost:8080"
         }
       }
